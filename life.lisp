@@ -16,13 +16,17 @@
 (defparameter *window-height* 600)
 (defparameter *window* nil)
 
+(defun over-grid-do (grid f)
+  (loop
+     for i from 0 to (- *grid-width* 1)
+     do (loop
+           for j from 0 to (- *grid-height* 1)
+           do (funcall f grid i j))))
+
 (defun init-grid ()
   (let ((grid (make-array (list *grid-width* *grid-height*))))
-    (loop
-       for i from 0 to (- *grid-width* 1)
-       do (loop
-             for j from 0 to (- *grid-height* 1)
-             do (setf (aref grid i j) (random 2))))
+    (over-grid-do grid
+                  (lambda (g x y) (setf (aref g x y) (random 2))))
     grid))
 
 (defun cell-width () (/ *window-width* *grid-width*))
@@ -66,28 +70,21 @@
 
 (defun update-grid (grid)
   (let ((tmp-grid (make-array (list *grid-width* *grid-height*))))
-    (loop
-       for i from 0 to (- *grid-width* 1)
-       do (loop
-             for j from 0 to (- *grid-height* 1)
-             do (setf (aref tmp-grid i j)
-                      (new-cell-status grid i j))))
+    (over-grid-do tmp-grid
+                  (lambda (g x y) (setf (aref g x y) (new-cell-status grid x y))))
     (setf *grid* tmp-grid)))
 
 (defun render-grid (grid)
   (clear-display *black*)
   (let ((cw (cell-width))
         (ch (cell-height)))
-    (loop
-       for i from 0 to (- *grid-width* 1)
-       do (loop
-             for j from 0 to (- *grid-height* 1)
-             do (when (eq (aref grid i j) 1)
-                  (draw-rectangle (rectangle :x (* i ch)
-                                             :y (* j cw)
-                                             :h ch
-                                             :w cw)
-                                  :color *green*))))))
+    (over-grid-do grid
+                  (lambda (g x y) (when (eq (aref g x y) 1)
+                                    (draw-rectangle (rectangle :x (* x ch)
+                                                               :y (* y cw)
+                                                               :h ch
+                                                               :w cw)
+                                                    :color *green*))))))
 
 (defun main ()
   (setf *grid* (init-grid))

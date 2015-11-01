@@ -80,10 +80,10 @@
         (ch (cell-height)))
     (over-grid-do grid
                   (lambda (g x y) (when (eq (aref g x y) 1)
-                                    (draw-rectangle (rectangle :x (* x ch)
-                                                               :y (* y cw)
-                                                               :h ch
-                                                               :w cw)
+                                    (draw-rectangle (rectangle :x (+ 1 (* x ch))
+                                                               :y (+ 1 (* y cw))
+                                                               :h (- ch 1)
+                                                               :w (- cw 1))
                                                     :color *green*))))))
 
 (defun main ()

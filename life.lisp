@@ -96,8 +96,8 @@
     (with-events ()
       (:quit-event () t)
       (:key-down-event (:key key)
-                       (when (sdl:key= key :sdl-key-escape))
-                       (sdl:push-quit-event))
+                       (case key
+                         (:sdl-key-escape (push-quit-event))))
       (:idle ()
              (update-grid *grid*)
              (render-grid *grid*)
